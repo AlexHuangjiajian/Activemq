@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+http://www.springframework.org/schema/jdbc
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--    &lt;!&ndash; 数据库连接信息的配置文件 &ndash;&gt;-->
+    <!--    <context:property-placeholder-->
+    <!--            location="classpath:database.properties" />-->
+
+
+    <!--    &lt;!&ndash; 数据库连接池 &ndash;&gt;-->
+    <!--    <bean id="dataSource"-->
+    <!--          class="com.alibaba.druid.pool.DruidDataSource"-->
+    <!--          p:driverClassName="${jdbc.driver}" p:url="${jdbc.url}"-->
+    <!--          p:username="${jdbc.username}" p:password="${jdbc.password}"-->
+    <!--          destroy-method="close" />-->
+
+
+<!--    &lt;!&ndash; 整合 mybatis &ndash;&gt;-->
+<!--    <bean id="sqlSessionFactory"-->
+<!--          class="org.mybatis.spring.SqlSessionFactoryBean"-->
+<!--          p:dataSource-ref="dataSource"-->
+<!--          p:mapperLocations="classpath:com/lanou/mapper/*.xml"/>-->
+
+<!--    &lt;!&ndash; 初始化数据库，是否在服务启动时执行schema.sql &ndash;&gt;-->
+<!--    <jdbc:initialize-database enabled="false">-->
+<!--        <jdbc:script location="classpath:database/schema.sql"/>-->
+<!--    </jdbc:initialize-database>-->
+
+<!--    &lt;!&ndash;  mybatis自动扫描 将Mapper接口生成代理注入到Spring &ndash;&gt;-->
+<!--    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"-->
+<!--          p:sqlSessionFactoryBeanName="sqlSessionFactory"-->
+<!--          p:basePackage="com.lanou.dao"/>-->
+<!--    <bean id="dataSource"/>-->
+
+    <!-- spring自动扫描：扫描用Service，和Repository注解申明的受管bean -->
+<!--    <context:component-scan-->
+<!--            base-package="com.lanou.biz">-->
+<!--        <context:include-filter type="annotation"-->
+<!--                                expression="org.springframework.stereotype.Service"/>-->
+<!--    </context:component-scan>-->
+<!--    <context:component-scan-->
+<!--            base-package="com.lanou.dao">-->
+<!--        <context:include-filter type="annotation"-->
+<!--                                expression="org.springframework.stereotype.Repository"/>-->
+<!--    </context:component-scan>-->
+
+<!--spring初始化的时候就启动了-->
+<!--    <bean id="broker" class="org.apache.activemq.broker.BrokerService" init-method="start" destroy-method="stop">-->
+<!--        <property name="brokerName" value="myBroker"></property>-->
+<!--        <property name="persistent" value="true"></property>-->
+<!--        <property name="transportConnectorURIs">-->
+<!--            <list>-->
+<!--                <value>tcp://localhost:61616</value>-->
+<!--            </list>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+        <context:component-scan
+                base-package="com.alex">
+            <context:include-filter type="annotation"
+                                    expression="org.springframework.stereotype.Controller"/>
+        </context:component-scan>
+
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+
+    <bean id="jmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+        <property name="connectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL">
+                    <value>tcp://localhost:61616</value>
+                </property>
+            </bean>
+        </property>
+      <property name="maxConnections" value="100"></property>
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="defaultDestination" ref="destinationTopic"></property>
+        <property name="messageConverter">
+            <bean class="org.springframework.jms.support.converter.SimpleMessageConverter"></bean>
+        </property>
+    </bean>
+
+    <bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg index="0" value="spring-queue"></constructor-arg>
+    </bean>
+
+    <bean id="destinationTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg index="0" value="spring-topic"></constructor-arg>
+    </bean>
+
+    <bean id="jmsContanier" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="destination" ref="destinationTopic"></property>
+        <property name="messageListener" ref="messageListener"></property>
+    </bean>
+    <bean id="messageListener" class="com.alex.spring.MyMessageListener"></bean>
+
+
+</beans>
