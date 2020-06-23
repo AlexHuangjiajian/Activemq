@@ -7,7 +7,7 @@ import javax.jms.*;
 public class QueueSender {
 
     public static void main(String[] args) throws JMSException {
-        ConnectionFactory  connectionFactory = new ActiveMQConnectionFactory("nio://localhost:61616");
+        ConnectionFactory  connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
         Connection connection = connectionFactory.createConnection();
         connection.start();
 
@@ -16,7 +16,7 @@ public class QueueSender {
         MessageProducer producer = session.createProducer(destination);
 
         for (int i = 0; i < 3; i++) {
-            TextMessage message = session.createTextMessage("message87947"+i);
+            TextMessage message = session.createTextMessage("message to mysql"+i);
             producer.send(message);
         }
         session.commit();

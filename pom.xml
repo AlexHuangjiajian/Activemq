@@ -67,6 +67,15 @@
             <version>1.7.4</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.druid/druid-core -->
+        <dependency>
+            <groupId>org.apache.druid</groupId>
+            <artifactId>druid-core</artifactId>
+            <version>0.18.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+
     </dependencies>
 
 

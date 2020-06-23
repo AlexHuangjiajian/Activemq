@@ -19,7 +19,7 @@ public class PersistenceSender {
         connection.start();
 
         for (int i = 0; i < 3; i++) {
-            TextMessage message = session.createTextMessage("message444--"+i);
+            TextMessage message = session.createTextMessage("message to mysql--"+i);
             messageProducer.send(message);
         }
         session.commit();

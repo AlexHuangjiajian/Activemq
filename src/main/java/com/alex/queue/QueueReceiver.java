@@ -7,7 +7,7 @@ import javax.jms.*;
 public class QueueReceiver {
 
     public static void main(String[] args) throws JMSException {
-        ConnectionFactory  connectionFactory = new ActiveMQConnectionFactory("nio://localhost:61616");
+        ConnectionFactory  connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
         Connection connection = connectionFactory.createConnection();
         connection.start();
 
