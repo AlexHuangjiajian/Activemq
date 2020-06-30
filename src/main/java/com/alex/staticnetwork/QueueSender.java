@@ -1,4 +1,4 @@
-package com.alex.queue;
+package com.alex.staticnetwork;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -15,8 +15,8 @@ public class QueueSender {
         Destination destination = session.createQueue("my-queue");
         MessageProducer producer = session.createProducer(destination);
 
-        for (int i = 0; i < 3; i++) {
-            TextMessage message = session.createTextMessage("networkMessage ccc"+i);
+        for (int i = 0; i <30; i++) {
+            TextMessage message = session.createTextMessage("networkMessage ddd"+i);
             producer.send(message);
         }
         session.commit();
